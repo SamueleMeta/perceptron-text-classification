@@ -1,20 +1,41 @@
-# Classificazione Testuale mediante Perceptron
+# Perceptron Text Classification
 
-Il progetto ha come scopo quello di mettere in luce proprietà e criticità dell'algoritmo Perceptron, qui utilizzato per classificare su base binaria le classi del dataset 20 Newsgroup. Per migliorarne l'accuratezza è stata poi implementata una versione votata che tiene conto del peso di ciascun piano.
+<p align="center">
+    <img src="https://i.imgur.com/lgi4uSY.jpg" width="250" alt="Università degli Studi Firenze"/>
+</p>
 
-## Prerequisiti
+## Overview
 
-Per poter eseguire correttamente il codice sono necessari:
+Despite the fact that the standard Perceptron provides a good result in its simplicity, it presents some criticalities. Suppose, for example, that we want to classify the XOR function. It is immediately evident that it is impossible to draw a plane that divides the positive examples from the negative ones without committing any error. It follows that the algorithm, not being data linearly separable, will continue to generate each time a different plan and the final one will be randomly determined by the moment in which the stop occurs after a certain number of iterations. 
 
-* [Scikit-Learn](http://scikit-learn.org/stable/index.html#) da cui è possibile ottenere il dataset 20 Newsgroup e diverse funzionalità per trattare il testo trasformandolo in input numerico.
-* [Numpy](http://www.numpy.org/) necessario ad eseguire le operazioni sui vettori.
-* [Memory Profiler](https://pypi.python.org/pypi/memory_profiler) utile per tenere traccia dell'occupazione di memoria.
-* [Pretty Table](https://pypi.python.org/pypi/PrettyTable) per formattare al meglio la matrice di confusione.
+<p align="center">
+    <img src="https://i.imgur.com/eO6M36Z.png" width="250" alt="xor function" />
+</p>
+       
+Suppose now to train the Perceptron and obtain, after a few iterations, a satisfactory classifier that correctly predicts the next 5000 submitted data points. If the last datum is classified incorrectly, the plan must be updated despite its previous accuracy. To limit these situations, whenever a plan has to change, the number _c_ of correct consecutive classifications will be saved. In this way, during testing, it will be possible to possible to determine the sign of an example by weighing the contribution of each plan, according to the formula:
+    
+<p align="center">
+    <a href="https://www.codecogs.com/eqnedit.php?latex=\sum_{i=1}^k&space;c_i&space;\cdot&space;sign(\vec{w}&space;\cdot&space;\vec{x})" target="_blank"><img      src="https://latex.codecogs.com/gif.latex?\sum_{i=1}^k&space;c_i&space;\cdot&space;sign(\vec{w}&space;\cdot&space;\vec{x})" title="\sum_{i=1}^k c_i \cdot sign(\vec{w} \cdot \vec{x})" /></a>
+</p>
+
+The experiments revealed, as expected, dependence on the order in which the data were shown as input. This implies that, for the same problem, different seeds can generate very different performance for the standard version, while the voted one remains stable. More details, schematized as the table below, can be found in the final report.
+
+<p align="center">
+    <img src="https://i.imgur.com/zvRXXsQ.png" width="500" alt="result table" />
+</p>
 
 
-## Esecuzione
+## Prerequisites
 
-L'interfaccia da cui è possibile compiere esperimenti è costituita dalla classe `test.py`. Sono stati riportate tre coppie di categorie di esempio, ma in generale possono essere scelte a piacere da tutte quelle disponibili:
+* [Scikit-Learn](http://scikit-learn.org/stable/index.html#) to obtain the 20 Newsgroup dataset and various functionalities to transform the text into a numeric input.
+* [Numpy](http://www.numpy.org/) to perform vectorized operations.
+* [Memory Profiler](https://pypi.python.org/pypi/memory_profiler) useful to keep trace of memory occupation.
+* [Pretty Table](https://pypi.python.org/pypi/PrettyTable) for a nice confusion matrix formatting.
+
+
+## Run
+
+Experiments can be launched from the `test.py` file, containing three category couples as an example. In general, it is possible to choose them from the following list:
 
 * comp.os.ms-windows.misc
 * comp.sys.ibm.pc.hardware
@@ -36,13 +57,14 @@ L'interfaccia da cui è possibile compiere esperimenti è costituita dalla class
 * alt.atheism
 * soc.religion.christian
 
-Nelle principali funzioni è possibile modificare il parametro `max_iter` per variare il numero di volte che si ciclerà sui dati di training e `seed` per cambiarne l'ordinamento.
+In the two main functions it is possible to change the `max_iter` and `seed` parameters, in order to affect the number of cycles on the training data and to obtain different scenarios according to the shuffling.
+
 ```python
 perceptron.test_default(categories, max_iter=10, seed=8)
 perceptron.test_voted(categories, max_iter=10, seed=8)
 ```
 
-Sebbene sia sconsigliato, all'interno della classe `util.py` è possible includere anche ulteriori elementi del testo originale come headers, footers e quotes rimuovendo l'ultimo attributo.
+Although it is not recommended, within the ```util.py``` class it is possible to include additional elements of the original text such as headers, footers and quotes by removing the last attribute.
 
 ```python
 train = fetch_20newsgroups(subset='train', categories=categories, shuffle=True,
@@ -51,19 +73,16 @@ test = fetch_20newsgroups(subset='test', categories=categories,
                               remove=('headers', 'footers', 'quotes'))
 ```
 
-Se si volesse ottenere un dettaglio grafico dell'utilizzo della memoria è necessario eseguire
+If you want to get a graphical detail of the memory usage you need to run
 
 ```
 mprof run test.py
 mprof plot
 ```
 
-## Riferimenti
+## References
 
-Nella realizzazione del progetto sono stati consultati:
-
-* [Large Margin Classification Using the Perceptron Algorithm](http://cseweb.ucsd.edu/~yfreund/papers/LargeMarginsUsingPerceptron.pdf) di Y. Freund e R.E. Schapire
-* [Studio sul dataset 20 Newsgroup e sue caratteristiche](http://cn-static.udacity.com/mlnd/Capstone_Poject_Sample01.pdf)
-* [Documentazione Scikit-Learn sulla classificazione testuale](http://scikit-learn.org/stable/tutorial/text_analytics/working_with_text_data.html)
-* [A Course in Machine Learning](http://ciml.info/dl/v0_99/ciml-v0_99-ch04.pdf) di Hal Daumé
+* [Large Margin Classification Using the Perceptron Algorithm](http://cseweb.ucsd.edu/~yfreund/papers/LargeMarginsUsingPerceptron.pdf) by Y. Freund and R.E. Schapire
+* [Working with text data](http://scikit-learn.org/stable/tutorial/text_analytics/working_with_text_data.html) from Scikit-Learn documentation
+* [A Course in Machine Learning](http://ciml.info/dl/v0_99/ciml-v0_99-ch04.pdf) by Hal Daumé
 
